@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>¿Quién crees que va a ganar?</title>
+    <link rel="stylesheet" href="style.css">
+<link rel="manifest" href="data:application/json;base64,eyJuYW1lIjoiVm90aW5nIEFwcCIsInNob3J0X25hbWUiOiJDMiBWb3RlIiwic3RhcnRfdXJsIjoiLi8iLCJkaXNwbGF5IjoiZnVsbHNjcmVlbiIsIm9yaWVudGF0aW9uIjoicG9ydHJhaXQiLCJiYWNrZ3JvdW5kX2NvbG9yIjoiIzFhMWExZTwifQ==">
+    <meta name="theme-color" content="#6c5ce7">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+</head>
+<body>
+    <div class="app-container">
+        <header>
+            <img id="header-logo" class="header-logo" src="./img/TN Ene 2025_BLANCO.png" alt="App Logo">
+            <h1>Votá al mejor piloto de la fecha</h1>
+            <p>Votá al piloto que más se destaco este fin de semana en Clase 2.</p>
+        </header>
+
+        <main id="characters-grid">
+            <!-- Characters will be injected by JavaScript -->
+        </main>
+
+        <!-- Vote Button -->
+        <div class="vote-button-container">
+            <button id="vote-btn" disabled>Votar</button>
+        </div>
+
+        <footer>
+            <p>Solo un voto por dispositivo</p>
+        </footer>
+    </div>
+
+    <!-- Thank You Modal -->
+    <div id="thank-you-modal" class="modal">
+        <div class="modal-content">
+            <div class="checkmark">✓</div>
+            <h2>¡Gracias por votar!</h2>
+            <p>Tu voto ya fue registrado. Seguí la carrera para descubrir al piloto elegido por el público.</p>
+            <p id="voted-character"></p>
+            <button id="close-modal" class="btn-primary">Close</button>
+        </div>
+    </div>
+
+    <!-- Already Voted Modal -->
+    <div id="already-voted-modal" class="modal">
+        <div class="modal-content">
+            <div class="warning-icon">⚠</div>
+            <h2>Ya participaste</h2>
+            <p>La próxima votación se habilitará en la proxima carrera.</p>
+            <button id="close-already-voted" class="btn-primary">OK</button>
+            <a href="https://www.instagram.com/prensatn" target="_blank" class="btn-primary" style="display: block; margin-top: 10px; text-decoration: none;">Conocer al ganador</a>
+        </div>
+    </div>
+
+    <!-- Error Modal -->
+    <div id="error-modal" class="modal">
+        <div class="modal-content">
+            <div class="error-icon">✗</div>
+            <h2>Error</h2>
+            <p id="error-message">Algo falló. Por favor intenta de nuevo.</p>
+            <button id="close-error" class="btn-primary">OK</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
+
