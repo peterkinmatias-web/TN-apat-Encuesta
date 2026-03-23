@@ -110,7 +110,7 @@ header p {
     cursor: pointer;
     transition: all 0.3s ease;
     border: 3px solid transparent;
-    box-shadow: 0 5px 20px rgba(250, 0, 0, 0.521);
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
     position: relative;
     overflow: hidden;
 }
@@ -131,7 +131,7 @@ header p {
 .character-card:hover {
     transform: translateY(-5px);
     border-color: var(--secondary-color);
-    box-shadow: 0 15px 40px rgba(252, 2, 2, 0.659);
+    box-shadow: 0 15px 40px rgba(108, 92, 231, 0.4);
 }
 
 .character-card:hover::before {
@@ -144,7 +144,7 @@ header p {
 
 .character-card.selected {
     border-color: var(--success-color);
-    box-shadow: 0 0 30px rgba(255, 1, 1, 0.5);
+    box-shadow: 0 0 30px rgba(0, 184, 148, 0.5);
 }
 
 .character-card.selected::after {
@@ -260,7 +260,7 @@ header p {
 footer {
     text-align: center;
     padding: 20px;
-    color: #ffffff;
+    color: var(--text-secondary);
     font-size: 0.85rem;
 }
 

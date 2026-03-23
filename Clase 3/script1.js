@@ -1,5 +1,11 @@
+document.addEventListener('DOMContentLoaded', async () => {
+  renderCharacters();
+  setupEventListeners();
+  setupModalEventListeners(); // <--- ESTA LÍNEA DEBE ESTAR AQUÍ
+  await checkIfVoted();
+});
 // VOTING APP - Fixed for numerical sort, no vote counts in UI, C2 sheet backend
-const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz1fBh-oy2IUOUxzU6LHgSh920zanEQVFJGGGARcrciM3XLPMCmWqezgoEqMmjcpXwy5w/exec';
+const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby-472W2iKysYdn_RYQZRYzcQD4R1f11KyoGBQ1tXh70wEUa5g4MMOvy_4fz9JvsG7Q/exec';
 
 const characters = [
   { name: '1 Julián Santero', image: 'https://drive.google.com/thumbnail?id=1V6OI8VjXsYBtntkjJr2hf0s1gBZ9pBpq&sz=w250-h250' },
@@ -57,6 +63,35 @@ function renderCharacters() {
   const grid = document.getElementById('characters-grid');
   grid.innerHTML = '';
 
+  function selectCharacter(name) {
+  // Si ya votó, no permitir seleccionar otro
+  if (hasVoted) {
+    alert("Ya has registrado tu voto.");
+    return;
+  }
+  
+  // Quitar la clase 'selected' de todos los demás
+  document.querySelectorAll('.character-card').forEach(card => {
+    card.classList.remove('selected');
+  });
+
+  // Buscar la tarjeta actual y marcarla
+  const selectedCard = document.querySelector(`[data-name="${name}"]`);
+  if (selectedCard) {
+    selectedCard.classList.add('selected');
+  }
+
+  // Guardar el personaje seleccionado en la variable global
+  selectedCharacter = characters.find(c => c.name === name);
+  
+  // Habilitar el botón de votar
+  const btn = document.getElementById('vote-btn');
+  if (btn) {
+    btn.disabled = false;
+    btn.textContent = 'Votar por ' + name.split(' ').slice(1).join(' '); // Opcional: solo muestra el apellido
+  }
+}
+
   characters.forEach((char) => {
     const card = document.createElement('div');
     card.className = 'character-card';
@@ -89,50 +124,40 @@ function setupModalEventListeners() {
   });
 }
 
-function selectCharacter(name) {
-  if (hasVoted) return showAlreadyVotedModal();
-  
-  document.querySelectorAll('.character-card').forEach(card => card.classList.remove('selected'));
-  document.querySelector(`[data-name="${name}"]`).classList.add('selected');
-  selectedCharacter = characters.find(c => c.name === name);
-  document.getElementById('vote-btn').disabled = false;
-}
-
 async function submitVote() {
-  if (!selectedCharacter) return showErrorModal('Select character first!');
+  if (!selectedCharacter) return alert('Selecciona un piloto');
   
   const btn = document.getElementById('vote-btn');
   btn.disabled = true;
-  btn.textContent = 'Loading...';
+  btn.textContent = 'Enviando...';
   
   try {
-    userIP = await getUserIP();
-    const response = await fetch(GOOGLE_SCRIPT_URL, {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({ip: userIP, characterName: selectedCharacter.name})
-    });
-    console.log('Response status:', response.status);
-    const data = await response.json();
-    console.log('Response data:', data);
+    const ip = await getUserIP();
     
-    if (data.success) {
-      localStorage.setItem('hasVoted', 'true');
-      localStorage.setItem('votedCharacter', selectedCharacter.name);
-      hasVoted = true;
-      showThankYouModal(selectedCharacter.name);
-    } else if (data.error === 'Already voted') {
-      hasVoted = true;
-      showAlreadyVotedModal();
-    } else {
-      showErrorModal(data.error || data.message || 'Vote failed');
-    }
+    // IMPORTANTE: Usar URLSearchParams y enviarlo en la URL o como FormData
+    const formData = new FormData();
+    formData.append('ip', ip);
+    formData.append('characterName', selectedCharacter.name);
+
+    // Usamos mode: 'no-cors' para evitar el bloqueo del navegador
+    await fetch(GOOGLE_SCRIPT_URL, {
+      method: 'POST',
+      body: formData,
+      mode: 'no-cors' 
+    });
+
+    // Como es 'no-cors', no podemos leer la respuesta, 
+    // así que asumimos éxito si no salta al catch
+    localStorage.setItem('hasVoted', 'true');
+    localStorage.setItem('votedCharacter', selectedCharacter.name);
+    hasVoted = true;
+    alert('¡Voto registrado para ' + selectedCharacter.name + '!');
+    disableVoting();
+
   } catch (e) {
     console.error(e);
-    showErrorModal('Network error - check console (F12): ' + e.message);
-  } finally {
-    btn.disabled = !hasVoted;
-    btn.textContent = 'Vota';
+    alert('Error al votar. Intenta de nuevo.');
+    btn.disabled = false;
   }
 }
 
@@ -174,4 +199,31 @@ function showAlreadyVotedModal() {
 function showErrorModal(msg) {
   document.getElementById('error-message').textContent = msg;
   document.getElementById('error-modal').classList.add('active');
+}
+
+function setupModalEventListeners() {
+  // Busca todos los botones que deberían cerrar modales
+  const closeButtons = [
+    'close-modal', 
+    'close-already-voted', 
+    'close-error',
+    'ok-btn' // Asegúrate de que el ID de tu botón "Ok" coincida
+  ];
+
+  closeButtons.forEach(id => {
+    const btn = document.getElementById(id);
+    if (btn) {
+      btn.onclick = () => {
+        // Busca cualquier modal activo y le quita la clase
+        document.querySelectorAll('.modal').forEach(m => m.classList.remove('active'));
+      };
+    }
+  });
+
+  // También permite cerrar haciendo clic fuera del cuadro blanco
+  document.querySelectorAll('.modal').forEach(modal => {
+    modal.onclick = (e) => {
+      if (e.target === modal) modal.classList.remove('active');
+    };
+  });
 }
