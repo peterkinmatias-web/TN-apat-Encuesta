@@ -1,0 +1,3 @@
+Copiar y pegar esta linea en la consola (F12) y apretar enter:
+
+localStorage.clear(); location.reload();
